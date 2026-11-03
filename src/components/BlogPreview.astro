@@ -1,0 +1,23 @@
+---
+import { getLangFromUrl, localizePath, useTranslations } from '../i18n/utils';
+import { getPosts } from '../lib/posts';
+import PostList from './PostList.astro';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const posts = (await getPosts(lang)).slice(0, 3);
+---
+
+<section id="blog" class="border-t border-line">
+  <div class="mx-auto grid max-w-6xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[1fr_2fr] lg:gap-16">
+    <div>
+      <h2 class="section-title">{t('blog.title')}</h2>
+      <a href={localizePath('/blog/', lang)} class="mt-4 inline-block font-semibold text-accent underline">
+        {t('blog.all')}
+      </a>
+    </div>
+    <div>
+      {posts.length > 0 ? <PostList posts={posts} lang={lang} /> : <p class="text-muted">{t('blog.empty')}</p>}
+    </div>
+  </div>
+</section>

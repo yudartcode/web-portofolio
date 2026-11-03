@@ -1,0 +1,105 @@
+---
+import type { Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const sub = {
+  emr: lang === 'id' ? 'fasilitas kesehatan' : 'health facility',
+  mediator: lang === 'id' ? 'pemetaan, antrean' : 'mapping, queue',
+  satusehat: lang === 'id' ? 'platform nasional' : 'national platform',
+  dhis2: lang === 'id' ? 'analitik' : 'analytics',
+};
+
+// Satu jalur per tujuan; paket berangkat bersama lalu berpisah di mediator.
+const toSatusehat = 'M148 150 H340 C374 150 370 75 404 75 H470';
+const toDhis2 = 'M148 150 H340 C374 150 370 225 404 225 H470';
+
+const nodes = [
+  { x: 8, y: 122, w: 140, label: 'EMR', sub: sub.emr },
+  { x: 200, y: 122, w: 140, label: 'Mediator', sub: sub.mediator, strong: true },
+  { x: 404, y: 47, w: 148, label: 'SATUSEHAT', sub: sub.satusehat },
+  { x: 404, y: 197, w: 148, label: 'DHIS2', sub: sub.dhis2 },
+];
+---
+
+<div class="rounded-2xl border border-line bg-surface p-3 sm:p-5">
+  <svg
+    viewBox="0 30 560 240"
+    class="flow block h-auto w-full"
+    role="img"
+    aria-label={lang === 'id'
+      ? 'Diagram: data mengalir dari EMR ke mediator, lalu ke SATUSEHAT dan DHIS2'
+      : 'Diagram: data flows from the EMR to a mediator, then to SATUSEHAT and DHIS2'}
+  >
+    <g fill="none" stroke="var(--line)" stroke-width="2" stroke-dasharray="4 5">
+      <path d="M148 150 H200"></path>
+      <path d="M340 150 C374 150 370 75 404 75"></path>
+      <path d="M340 150 C374 150 370 225 404 225"></path>
+    </g>
+
+    <circle class="packet" r="6" style={`offset-path: path('${toSatusehat}')`}></circle>
+    <circle class="packet packet-b" r="6" style={`offset-path: path('${toDhis2}')`}></circle>
+
+    {
+      nodes.map((n) => (
+        <g>
+          <rect
+            x={n.x}
+            y={n.y}
+            width={n.w}
+            height="56"
+            rx="10"
+            fill="var(--surface)"
+            stroke={n.strong ? 'var(--accent)' : 'var(--ink)'}
+            stroke-width={n.strong ? 2 : 1.25}
+          />
+          <text x={n.x + 14} y={n.y + 25} fill="var(--ink)" font-size="16" font-weight="700">
+            {n.label}
+          </text>
+          <text x={n.x + 14} y={n.y + 43} fill="var(--muted)" font-size="11.5">
+            {n.sub}
+          </text>
+        </g>
+      ))
+    }
+  </svg>
+</div>
+
+<style>
+  .flow text {
+    font-family: var(--font-sans);
+  }
+  .packet {
+    fill: var(--signal);
+    offset-rotate: 0deg;
+    offset-distance: 0%;
+    opacity: 0;
+    animation: travel 3.6s cubic-bezier(0.45, 0, 0.3, 1) 0.6s infinite;
+  }
+  @keyframes travel {
+    0% {
+      offset-distance: 0%;
+      opacity: 0;
+    }
+    6% {
+      opacity: 1;
+    }
+    70% {
+      offset-distance: 100%;
+      opacity: 1;
+    }
+    76%,
+    100% {
+      offset-distance: 100%;
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .packet {
+      display: none;
+    }
+  }
+</style>

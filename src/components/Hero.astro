@@ -1,0 +1,31 @@
+---
+import { profile } from '../data/profile';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+import FlowDiagram from './FlowDiagram.astro';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const [first, ...rest] = profile.shortName.split(' ');
+---
+
+<section class="mx-auto grid max-w-6xl items-center gap-12 px-4 pt-14 pb-20 sm:px-6 lg:grid-cols-[1.1fr_1fr] lg:gap-16 lg:pt-24 lg:pb-28">
+  <div>
+    <p class="mb-5 text-lg text-muted">{t('hero.role')}, {profile.location}</p>
+    <h1 class="display text-[clamp(3.4rem,12vw,7rem)]">
+      <span class="block">{first}</span>
+      <span class="block">{rest.join(' ')}</span>
+    </h1>
+    <p class="mt-8 max-w-[34ch] text-xl leading-snug text-pretty sm:text-[1.4rem]">{t('hero.lead')}</p>
+    <div class="mt-9 flex flex-wrap gap-3">
+      <a href="#projects" class="btn btn-primary">{t('hero.cta.projects')}</a>
+      <a href={profile.cv} class="btn btn-ghost" download>{t('hero.cta.cv')}</a>
+    </div>
+  </div>
+
+  <figure>
+    <FlowDiagram lang={lang} />
+    <figcaption class="mt-4 max-w-[48ch] text-[0.95rem] leading-relaxed text-muted">
+      {t('hero.diagram.caption')}
+    </figcaption>
+  </figure>
+</section>

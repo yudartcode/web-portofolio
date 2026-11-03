@@ -1,0 +1,201 @@
+@import "tailwindcss";
+@import "@fontsource/russo-one/latin.css";
+@import "@fontsource/russo-one/latin-ext.css";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/jetbrains-mono";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Palet: biru-abu dingin + kobalt (aksi) + hijau sinyal (data mengalir). */
+:root {
+  --bg: #f2f4f7;
+  --surface: #ffffff;
+  --ink: #16202b;
+  --muted: #566170;
+  --line: #d5dbe3;
+  --accent: #2546c8;
+  --accent-ink: #ffffff;
+  --signal: #0d7f62;
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #0f1620;
+  --surface: #16202d;
+  --ink: #e4e9f0;
+  --muted: #93a0b0;
+  --line: #273546;
+  --accent: #8ea4ff;
+  --accent-ink: #0f1620;
+  --signal: #3fd1a6;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-signal: var(--signal);
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Russo One", "Inter Variable", ui-sans-serif, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+}
+
+@layer base {
+  html {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+  body {
+    background: var(--bg);
+    min-height: 100dvh;
+  }
+  ::selection {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  a {
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: 1px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Judul display: lebar sempit + berat tinggi, jadi elemen visual utama. */
+  .display {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 0.95;
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(1.9rem, 4vw, 2.6rem);
+    letter-spacing: -0.005em;
+    line-height: 1.1;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.15rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+  .btn-primary:hover {
+    background: color-mix(in oklab, var(--accent) 85%, var(--ink));
+  }
+  .btn-ghost {
+    border: 1px solid var(--line);
+    color: var(--ink);
+  }
+  .btn-ghost:hover {
+    border-color: var(--ink);
+  }
+  .tag {
+    font-size: 0.8rem;
+    padding: 0.1rem 0.55rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* Konten blog */
+  .prose {
+    max-width: 68ch;
+  }
+  .prose > * + * {
+    margin-top: 1.1em;
+  }
+  .prose h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.5rem;
+    line-height: 1.2;
+    margin-top: 2em;
+  }
+  .prose h3 {
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-top: 1.6em;
+  }
+  .prose a {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+  .prose ul {
+    list-style: disc;
+    padding-left: 1.3em;
+  }
+  .prose ol {
+    list-style: decimal;
+    padding-left: 1.3em;
+  }
+  .prose li + li {
+    margin-top: 0.35em;
+  }
+  .prose blockquote {
+    border-left: 3px solid var(--line);
+    padding-left: 1em;
+    color: var(--muted);
+  }
+  .prose :not(pre) > code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+  }
+  .prose pre {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1.55;
+    padding: 1rem 1.15rem;
+    border-radius: 0.6rem;
+    border: 1px solid var(--line);
+    overflow-x: auto;
+  }
+}
+
+/* Shiki dual theme: ikuti kelas .dark */
+.dark .astro-code,
+.dark .astro-code span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+}

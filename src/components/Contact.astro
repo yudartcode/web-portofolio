@@ -1,0 +1,28 @@
+---
+import { profile } from '../data/profile';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<section id="contact" class="border-t border-line bg-surface">
+  <div class="mx-auto max-w-6xl px-4 py-24 sm:px-6">
+    <h2 class="display text-[clamp(2.6rem,7vw,5rem)]">{t('contact.title')}</h2>
+    <p class="mt-6 max-w-[52ch] text-lg text-pretty">{t('contact.lead')}</p>
+    <div class="mt-9 flex flex-wrap items-center gap-3">
+      <a href={`mailto:${profile.email}`} class="btn btn-primary">{t('contact.email')}</a>
+      {
+        profile.socials.map((s) => (
+          <a href={s.href} target="_blank" rel="me noopener" class="btn btn-ghost">
+            {s.label}
+          </a>
+        ))
+      }
+      <a href={profile.cv} class="btn btn-ghost" download>{t('hero.cta.cv')}</a>
+    </div>
+    <p class="mt-6 text-muted">
+      <a href={`mailto:${profile.email}`} class="underline hover:text-ink">{profile.email}</a>
+    </p>
+  </div>
+</section>

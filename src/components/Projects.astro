@@ -1,0 +1,61 @@
+---
+import { projects } from '../data/projects';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<section id="projects" class="border-t border-line">
+  <div class="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+    <div class="mb-12 grid gap-4 lg:grid-cols-[1fr_2fr] lg:gap-16">
+      <h2 class="section-title">{t('projects.title')}</h2>
+      <p class="max-w-[52ch] self-end text-lg text-muted">{t('projects.intro')}</p>
+    </div>
+
+    <ul>
+      {
+        projects.map((p) => (
+          <li class="grid gap-4 border-t border-line py-8 lg:grid-cols-[1fr_2fr] lg:gap-16">
+            <div>
+              <h3 class="font-display text-[1.6rem] leading-tight">{p.name}</h3>
+              <p class="mt-1 text-muted">{p.context[lang]}</p>
+            </div>
+            <div class="grid gap-6 md:grid-cols-[3fr_2fr]">
+              <div>
+                <p class="text-[1.05rem] text-pretty">{p.summary[lang]}</p>
+                <ul class="mt-3 space-y-1.5 text-[0.95rem] text-muted">
+                  {p.points[lang].map((pt) => (
+                    <li class="relative pl-4 before:absolute before:top-[0.7em] before:left-0 before:size-1.5 before:rounded-full before:bg-signal">
+                      {pt}
+                    </li>
+                  ))}
+                </ul>
+                {p.links && p.links.length > 0 && (
+                  <p class="mt-4 flex flex-wrap gap-4">
+                    {p.links.map((l) => (
+                      <a href={l.href} target="_blank" rel="noopener" class="font-semibold text-accent underline">
+                        {l.label}
+                      </a>
+                    ))}
+                  </p>
+                )}
+              </div>
+              <div class="space-y-3">
+                <p class="text-[0.95rem]">
+                  <span class="text-muted">{t('projects.role')}: </span>
+                  <span class="font-semibold">{p.role[lang]}</span>
+                </p>
+                <ul class="flex flex-wrap gap-1.5" aria-label="Tech">
+                  {p.tech.map((x) => (
+                    <li class="tag">{x}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

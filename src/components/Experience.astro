@@ -1,0 +1,111 @@
+---
+import { education, jobs } from '../data/experience';
+import { formatMonth, getLangFromUrl, useTranslations } from '../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const range = (start: string, end: string | null) =>
+  `${formatMonth(start, lang)} – ${end ? formatMonth(end, lang) : t('experience.present')}`;
+
+// Grafik ala git: jalur utama di kiri, pekerjaan paralel sebagai cabang di kanan.
+const MAIN_X = 11;
+const SIDE_X = 35;
+const lastMain = jobs.map((j) => j.lane).lastIndexOf('main');
+
+const rows = jobs.map((job, i) => {
+  const mergesFromSide = job.lane === 'main' && jobs[i - 1]?.lane === 'side';
+  const dotY = mergesFromSide ? 38 : 9;
+  return {
+    job,
+    dotY,
+    mergesFromSide,
+    current: job.end === null,
+    mainLineEndsAtDot: i === lastMain,
+  };
+});
+---
+
+<section id="experience" class="border-t border-line">
+  <div class="mx-auto grid max-w-6xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[1fr_2fr] lg:gap-16">
+    <div>
+      <h2 class="section-title">{t('experience.title')}</h2>
+      <p class="mt-4 max-w-[36ch] text-muted">{t('experience.intro')}</p>
+    </div>
+
+    <div>
+      <ol>
+        {
+          rows.map(({ job, dotY, mergesFromSide, current, mainLineEndsAtDot }) => {
+            const isSide = job.lane === 'side';
+            const x = isSide ? SIDE_X : MAIN_X;
+            return (
+              <li class="relative pb-10 pl-16" style={mergesFromSide ? 'padding-top: 29px' : undefined}>
+                {/* Jalur utama */}
+                <span
+                  aria-hidden="true"
+                  class="absolute w-0.5 bg-line"
+                  style={`left:${MAIN_X - 1}px; top:0; ${mainLineEndsAtDot ? `height:${dotY}px` : 'bottom:0'}`}
+                />
+                {/* Cabang: garis dari titik ke bawah */}
+                {isSide && (
+                  <span
+                    aria-hidden="true"
+                    class="absolute w-0.5 bg-signal/60"
+                    style={`left:${SIDE_X - 1}px; top:${dotY}px; bottom:0`}
+                  />
+                )}
+                {/* Cabang bergabung dari jalur utama */}
+                {mergesFromSide && (
+                  <svg aria-hidden="true" class="absolute top-0 left-0" width="48" height={dotY} fill="none">
+                    <path
+                      d={`M${SIDE_X} 0 C${SIDE_X} ${dotY * 0.55} ${MAIN_X} ${dotY * 0.45} ${MAIN_X} ${dotY}`}
+                      stroke="var(--signal)"
+                      stroke-opacity="0.6"
+                      stroke-width="2"
+                    />
+                  </svg>
+                )}
+                {/* Titik */}
+                <span
+                  aria-hidden="true"
+                  class:list={[
+                    'absolute size-3.5 rounded-full border-2',
+                    isSide ? 'border-signal bg-bg' : current ? 'border-accent bg-accent' : 'border-accent bg-bg',
+                  ]}
+                  style={`left:${x - 7}px; top:${dotY - 7}px`}
+                />
+
+                <p class="text-sm text-muted tabular-nums">{range(job.start, job.end)}</p>
+                <h3 class="mt-1 text-xl leading-snug font-bold">
+                  {job.role}
+                  <span class="font-normal text-muted"> {lang === 'id' ? 'di' : 'at'} </span>
+                  {job.company}
+                </h3>
+                <ul class="mt-3 space-y-1.5 text-[0.98rem]">
+                  {job.points[lang].map((pt) => (
+                    <li class="text-pretty">{pt}</li>
+                  ))}
+                </ul>
+              </li>
+            );
+          })
+        }
+      </ol>
+
+      <h3 class="mt-6 mb-5 text-xl font-bold">{t('education.title')}</h3>
+      <ul class="space-y-4">
+        {
+          education.map((e) => (
+            <li class="border-l-2 border-line pl-4">
+              <p class="font-semibold">{e.title[lang]}</p>
+              <p class="text-muted">
+                {e.school}, <span class="tabular-nums">{range(e.start, e.end)}</span>
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>

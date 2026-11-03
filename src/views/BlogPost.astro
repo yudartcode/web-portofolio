@@ -1,0 +1,50 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { formatDate, getLangFromUrl, localizePath, useTranslations } from '../i18n/utils';
+import { postSlug, readingMinutes } from '../lib/posts';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+  hasTranslation: boolean;
+}
+
+const { post, hasTranslation } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const other = lang === 'id' ? 'en' : 'id';
+const { Content } = await render(post);
+const path = `/blog/${postSlug(post)}/`;
+---
+
+<Base
+  title={post.data.title}
+  description={post.data.description}
+  alternatePath={{ [other]: hasTranslation ? localizePath(path, other) : localizePath('/blog/', other) }}
+>
+  <article class="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-20">
+    <a href={localizePath('/blog/', lang)} class="text-muted underline hover:text-ink">{t('blog.back')}</a>
+    <header class="mt-8 mb-10">
+      <h1 class="text-[clamp(2.2rem,6vw,3.5rem)] font-display leading-[1.08]">
+        {post.data.title}
+      </h1>
+      <p class="mt-4 text-muted">
+        <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date, lang)}</time>, {
+          readingMinutes(post.body)
+        } {t('blog.readTime')}
+      </p>
+      {
+        post.data.tags.length > 0 && (
+          <ul class="mt-4 flex flex-wrap gap-1.5">
+            {post.data.tags.map((tag) => (
+              <li class="tag">{tag}</li>
+            ))}
+          </ul>
+        )
+      }
+    </header>
+    <div class="prose text-[1.05rem]">
+      <Content />
+    </div>
+  </article>
+</Base>

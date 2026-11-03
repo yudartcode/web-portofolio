@@ -1,0 +1,9 @@
+---
+import BlogPost from '../../views/BlogPost.astro';
+import { blogStaticPaths } from '../../lib/paths';
+
+export const getStaticPaths = () => blogStaticPaths('id');
+const { post, hasTranslation } = Astro.props;
+---
+
+<BlogPost post={post} hasTranslation={hasTranslation} />

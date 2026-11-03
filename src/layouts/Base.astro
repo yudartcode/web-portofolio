@@ -1,0 +1,68 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { profile } from '../data/profile';
+import { getLangFromUrl, localizePath, stripLang, useTranslations } from '../i18n/utils';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Path versi bahasa lain jika berbeda (mis. tulisan tanpa terjemahan). */
+  alternatePath?: { id?: string | null; en?: string | null };
+}
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const { title, description = t('meta.description'), alternatePath } = Astro.props;
+const pageTitle = title ? `${title} — ${profile.shortName}` : `${profile.shortName} — ${t('hero.role')}`;
+const base = stripLang(Astro.url.pathname);
+const alt = {
+  id: alternatePath?.id === undefined ? localizePath(base, 'id') : alternatePath.id,
+  en: alternatePath?.en === undefined ? localizePath(base, 'en') : alternatePath.en,
+};
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {alt.id && <link rel="alternate" hreflang="id" href={new URL(alt.id, Astro.site)} />}
+    {alt.en && <link rel="alternate" hreflang="en" href={new URL(alt.en, Astro.site)} />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate" type="application/rss+xml" title={profile.shortName} href={localizePath('/rss.xml', lang)} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta name="theme-color" content="#f2f4f7" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f1620" media="(prefers-color-scheme: dark)" />
+    <script is:inline>
+      (() => {
+        let theme = null;
+        try { theme = localStorage.getItem('theme'); } catch {}
+        if (theme !== 'light' && theme !== 'dark') {
+          theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+      })();
+    </script>
+  </head>
+  <body class="flex min-h-dvh flex-col">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded focus:bg-accent focus:px-3 focus:py-2 focus:text-accent-ink"
+      >{t('nav.skip')}</a
+    >
+    <Header altPath={lang === 'id' ? alt.en : alt.id} />
+    <main id="main" class="flex-1">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
