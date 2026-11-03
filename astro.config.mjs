@@ -7,7 +7,7 @@ import sitemap from '@astrojs/sitemap';
 // https://astro.build/config
 export default defineConfig({
   // Ganti dengan domain asli saat deploy (dipakai untuk sitemap, RSS, dan meta canonical).
-  site: 'https://yudakarnaen.dev',
+  site: 'https://yudakarnaen.vercel.app',
   i18n: {
     defaultLocale: 'id',
     locales: ['id', 'en'],
